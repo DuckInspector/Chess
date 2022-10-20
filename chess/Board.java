@@ -2,6 +2,8 @@ package chess;
 
 import chess.pieces.*;
 
+import javax.swing.*;
+
 public class Board {
     //instances
     public Piece[][] board;
@@ -16,7 +18,6 @@ public class Board {
         if (board[p.row][p.column] == null) return false;
         else return true;
     }
-
 
 }
 

@@ -1,24 +1,42 @@
 package chess;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 public class MyFrame extends JFrame {
 
-     public MyFrame() {
-         //for (int i = 0; i < 64; i++);
-            //c.add(new JButton(Action ));
+    public MyFrame() {
         setSize(1000, 1000);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setVisible(true);
+        JPanel panel = new JPanel();
 
-         Icon icon = new ImageIcon("images.bking.png");
-         JButton button = new JButton(icon);
-         button.setVisible(true);
-         add(button);
+        /*create new chess piece icon*/
+        JButton button = new JButton();
+        BufferedImage image = null;
+        try {
+            Image img = ImageIO.read(new File("resources/images/bking.png"));
+            img = img.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+            button.setIcon(new ImageIcon(img));
+            button.setContentAreaFilled(false);
+            button.setFocusPainted(false);
+            button.setBorderPainted(false);
+            button.setOpaque(false);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        add(button);
+        button.setVisible(true);
 
+
+        panel.add(button);
+        panel.setVisible(true);
+        add(panel);
+        pack();
     }
 
+    @Override
     public void paint(Graphics g) {
 
         Graphics2D g2D = (Graphics2D) g;

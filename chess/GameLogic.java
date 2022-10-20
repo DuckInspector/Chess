@@ -17,13 +17,14 @@ abstract class GameLogic {
 
     public static void main(String[] args) {
         //set new board
-        Piece[][] p = new Piece[9][9];
-        Board b = new Board(p);
-        setPieces(b);
+        //Piece[][] p = new Piece[9][9];
+        //Board b = new Board(p);
+        //setPieces(b);
         turn = 'w';
 
         //display board
-        new MyFrame();
+        new MyFrame().setVisible(true);
+
         /*while (true) {
             Display(b);
             MakeMove(turn, b);
