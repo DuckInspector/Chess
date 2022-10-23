@@ -1,67 +1,60 @@
 package chess;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class MyFrame extends JFrame {
+    public JPanel buttonPanel;
+    public MyFrame(Board b) {
 
-    public MyFrame() {
-        setSize(1000, 1000);
-        JPanel panel = new JPanel();
+        setPreferredSize(new Dimension(800, 828));
+        //create board background panel
+        Background background = new Background();
 
-        /*create new chess piece icon*/
-        JButton button = new JButton();
-        BufferedImage image = null;
-        try {
-            Image img = ImageIO.read(new File("resources/images/bking.png"));
-            img = img.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-            button.setIcon(new ImageIcon(img));
-            button.setContentAreaFilled(false);
-            button.setFocusPainted(false);
-            button.setBorderPainted(false);
-            button.setOpaque(false);
-        } catch (Exception e) {
-            System.out.println(e);
+        buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(8, 8));
+        buttonPanel.setPreferredSize(new Dimension(800, 800));
+        buttonPanel.setOpaque(false);
+
+
+        /* --------- creates buttons ----------- */
+        for (int rows = 8; rows >= 1; rows--) {
+            for (int columns = 1; columns <= 8; columns++) {
+                JButton button = new JButton();
+                if (b.board[rows][columns] == null) {
+                    button.setName("" + rows + columns);
+                    button.setFocusPainted(false);
+                    button.setBorderPainted(false);
+                    button.setOpaque(false);
+                    buttonPanel.add(button);
+                } else {
+                    button.setIcon(b.board[rows][columns].icon);
+                    button.setName("" + rows + columns);
+                    button.setContentAreaFilled(false);
+                    button.setFocusPainted(false);
+                    button.setBorderPainted(false);
+                    button.setOpaque(false);
+                }
+                button.addActionListener(actionEvent -> {
+                    JButton click = (JButton) actionEvent.getSource();
+                    GameLogic.Move(click);
+                });
+                button.setVisible(true);
+                buttonPanel.add(button);
+            }
         }
-        add(button);
-        button.setVisible(true);
+        /* --------------------------------------- */
+        //for (Component bu : buttonPanel.getComponents()) System.out.println(bu.getName() + " ");
+        setContentPane(background);
+        add(buttonPanel);
+        background.setVisible(true);
+        buttonPanel.setVisible(true);
 
-
-        panel.add(button);
-        panel.setVisible(true);
-        add(panel);
+        //setResizable(false);
         pack();
-    }
-
-    @Override
-    public void paint(Graphics g) {
-
-        Graphics2D g2D = (Graphics2D) g;
-
-        //paint board
-
-         for (int i = 1; i <= 7; i += 2)
-            for (int j = 1; j <= 8; j++){
-                g2D.setPaint(Color.pink);
-                if (j % 2 != 0) g2D.fillRect(i * 100, j * 100, 100, 100);
-                else {
-                    g2D.setPaint(Color.white);
-                    g2D.fillRect(i * 100, j * 100, 100, 100);
-                }
-            }
-        for (int i = 2; i <= 8 ; i += 2)
-            for (int j = 1; j <= 8; j++){
-                g2D.setPaint(Color.pink);
-                if (j % 2 == 0) g2D.fillRect(i * 100, j * 100, 100, 100);
-                else {
-                    g2D.setPaint(Color.white);
-                    g2D.fillRect(i * 100, j * 100, 100, 100);
-                }
-            }
-
-
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 }

@@ -10,34 +10,18 @@ public class Position {
     }
 
     public boolean isLegal(){
-        if (row > 0 && row < 9 && column > 0 && column < 9) return true;
-        else return false;
-    }
-
-    //getters and setters
-    public int getRow() {
-        return row;
-    }
-    public int getColumn() {
-        return column;
-    }
-    public void setRow(int row) {
-        this.row = row;
-    }
-    public void setColumn(int column) {
-        this.column = column;
+        return row > 0 && row < 9 && column > 0 && column < 9;
     }
 
     @Override
     public boolean equals(Object o) {
         Position p = (Position) o;
-        if (row == p.row && column == p.column) return true;
-        else return false;
+        return row == p.row && column == p.column;
     }
 
     @Override
     public String toString() {
-        String s = (row + ", " + column);
-        return s;
+
+        return (column + ", " + (char) (row + 48));
     }
 }

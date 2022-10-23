@@ -2,8 +2,6 @@ package chess;
 
 import chess.pieces.*;
 
-import javax.swing.*;
-
 public class Board {
     //instances
     public Piece[][] board;
@@ -15,9 +13,10 @@ public class Board {
 
     //methods
     public boolean isOccupied (Position p){
-        if (board[p.row][p.column] == null) return false;
-        else return true;
+        return board[p.row][p.column] != null;
     }
-
+    public Piece whichPiece(Position p) {
+        return board[p.row][p.column];
+    }
 }
 
