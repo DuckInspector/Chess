@@ -7,8 +7,9 @@ import java.awt.*;
 
 abstract class GameLogic {
     static char turn;
+
     private static boolean flag;
-    private static MyFrame f;
+    private static BoardFrame f;
     private static Board b;
     private static Position p1, p2;
     private static Piece selectedPiece;
@@ -21,7 +22,7 @@ abstract class GameLogic {
         flag = false;
         
         //create frame
-        f = new MyFrame(b); //MyFrame creates frame, panel and buttons. Has "JButton click" instance that detects clicks
+        f = new BoardFrame(b); //BoardFrame creates frame, panel and buttons. Has "JButton click" instance that detects clicks
         f.setVisible(true);
     }
 
@@ -67,10 +68,9 @@ abstract class GameLogic {
             return 0;
         }
 
-        //when valid piece has been selected
+        //when valid piece has been selected, select a destination square
         String click2 = click.getName();
         p2 = new Position(click2.charAt(0) - 48, click2.charAt(1) - 48);
-
 
         if (b.isOccupied(p2)) { //case: occupied square
             Piece secondClickedPiece = b.whichPiece(p2);
@@ -82,7 +82,7 @@ abstract class GameLogic {
                 for (Position p : selectedPiece.legalMoves) System.out.println(p + " ");
                 System.out.println("---------");
                 return 0;
-            } else if ((selectedPiece.legalMoves).contains(p2)) {    //case: second piece is enemy piece
+            } else if ((selectedPiece.legalMoves).contains(p2)) {    //case: second piece is enemy piece (eating behaviour)
                 //updates board
                 b.board[p2.row][p2.column] = selectedPiece;
                 b.board[p1.row][p1.column] = null;
@@ -110,53 +110,54 @@ abstract class GameLogic {
             //updates board
             b.board[p2.row][p2.column] = selectedPiece;
             b.board[p1.row][p1.column] = null;
-            if (selectedPiece instanceof King && (p2.column - p1.column) < -1){ //king is long castling
-                if (selectedPiece.color == 'w') {
-                    b.board[1][4] = b.board[1][1];
-                    b.board[1][1] = null;
-                    b.board[1][4].position = new Position(1, 4);
+            //CASTLING
+            {
+                if (selectedPiece instanceof King && (p2.column - p1.column) < -1) { //king is long castling
+                    if (selectedPiece.color == 'w') {
+                        b.board[1][4] = b.board[1][1];
+                        b.board[1][1] = null;
+                        b.board[1][4].position = new Position(1, 4);
 
-                    Component[] c = f.buttonPanel.getComponents();
-                    JButton b1 = (JButton) c[(8 - 1) * 8 + 1 - 1];
-                    b1.setIcon(null);
-                    JButton b2 = (JButton) c[(8 - 1) * 8 + 4 - 1];
-                    b2.setIcon(b.board[1][4].icon);
+                        Component[] c = f.buttonPanel.getComponents();
+                        JButton b1 = (JButton) c[(8 - 1) * 8 + 1 - 1];
+                        b1.setIcon(null);
+                        JButton b2 = (JButton) c[(8 - 1) * 8 + 4 - 1];
+                        b2.setIcon(b.board[1][4].icon);
 
-                }
-                else {
-                    b.board[8][4] = b.board[8][1];
-                    b.board[8][1] = null;
-                    b.board[8][4].position = new Position(8, 4);
+                    } else {
+                        b.board[8][4] = b.board[8][1];
+                        b.board[8][1] = null;
+                        b.board[8][4].position = new Position(8, 4);
 
-                    Component[] c = f.buttonPanel.getComponents();
-                    JButton b1 = (JButton) c[(8 - 8) * 8 + 1 - 1];
-                    b1.setIcon(null);
-                    JButton b2 = (JButton) c[(8 - 8) * 8 + 4 - 1];
-                    b2.setIcon(b.board[8][4].icon);
-                }
-            } else if (selectedPiece instanceof King && (p2.column - p1.column) > 1) { //king is short castling
-                if (selectedPiece.color == 'w') {
-                    b.board[1][6] = b.board[1][8];
-                    b.board[1][8] = null;
-                    b.board[1][6].position = new Position(1, 6);
+                        Component[] c = f.buttonPanel.getComponents();
+                        JButton b1 = (JButton) c[(8 - 8) * 8 + 1 - 1];
+                        b1.setIcon(null);
+                        JButton b2 = (JButton) c[(8 - 8) * 8 + 4 - 1];
+                        b2.setIcon(b.board[8][4].icon);
+                    }
+                } else if (selectedPiece instanceof King && (p2.column - p1.column) > 1) { //king is short castling
+                    if (selectedPiece.color == 'w') {
+                        b.board[1][6] = b.board[1][8];
+                        b.board[1][8] = null;
+                        b.board[1][6].position = new Position(1, 6);
 
-                    Component[] c = f.buttonPanel.getComponents();
-                    JButton b1 = (JButton) c[(8 - 1) * 8 + 8 - 1];
-                    b1.setIcon(null);
-                    JButton b2 = (JButton) c[(8 - 1) * 8 + 6 - 1];
-                    b2.setIcon(b.board[1][6].icon);
+                        Component[] c = f.buttonPanel.getComponents();
+                        JButton b1 = (JButton) c[(8 - 1) * 8 + 8 - 1];
+                        b1.setIcon(null);
+                        JButton b2 = (JButton) c[(8 - 1) * 8 + 6 - 1];
+                        b2.setIcon(b.board[1][6].icon);
 
-                }
-                else {
-                    b.board[8][6] = b.board[8][8];
-                    b.board[8][8] = null;
-                    b.board[8][6].position = new Position(8, 6);
+                    } else {
+                        b.board[8][6] = b.board[8][8];
+                        b.board[8][8] = null;
+                        b.board[8][6].position = new Position(8, 6);
 
-                    Component[] c = f.buttonPanel.getComponents();
-                    JButton b1 = (JButton) c[(8 - 8) * 8 + 8 - 1];
-                    b1.setIcon(null);
-                    JButton b2 = (JButton) c[(8 - 8) * 8 + 6 - 1];
-                    b2.setIcon(b.board[8][6].icon);
+                        Component[] c = f.buttonPanel.getComponents();
+                        JButton b1 = (JButton) c[(8 - 8) * 8 + 8 - 1];
+                        b1.setIcon(null);
+                        JButton b2 = (JButton) c[(8 - 8) * 8 + 6 - 1];
+                        b2.setIcon(b.board[8][6].icon);
+                    }
                 }
             }
             //update piece position

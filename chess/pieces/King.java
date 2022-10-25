@@ -6,7 +6,6 @@ import chess.Position;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class King extends Piece {
@@ -23,7 +22,7 @@ public class King extends Piece {
             icon = new ImageIcon(img);
 
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Can't open icon image!");
         }
     }
 
@@ -35,8 +34,10 @@ public class King extends Piece {
                 Position p = new Position(position.row + i, position.column + j);
                 if (i == 0 && j == 0) break;
                 if (p.isLegal())
-                    if (!board.isOccupied(p)) legalMoves.add(p);
-                    else if (board.whichPiece(p).color != color) legalMoves.add(p); //eating behaviour
+                    if (!isAttacked(p))
+                        if (!board.isOccupied(p)) legalMoves.add(p);
+                        else if (board.whichPiece(p).color != color) legalMoves.add(p); //eating behaviour
+
             }
         }
 
@@ -49,89 +50,67 @@ public class King extends Piece {
             else              legalMoves.add(new Position(8, 7));
     }
 
+    private boolean canCastle(int longOrShort) {
+        Position p1, p2, p3;
+        boolean notUnderAttack, notOccupied;
+
+        if (longOrShort == 1) { //long castle
+            if (!hasMoved && !board.whichPiece(new Position(1, 1)).hasMoved){ //long castle
+                if (color == 'w'){
+                    p1 = new Position(1, 2);
+                    p2 = new Position(1, 3);
+                    p3 = new Position(1, 4);
+                } else {
+                    p1 = new Position(8, 2);
+                    p2 = new Position(8, 3);
+                    p3 = new Position(8, 4);
+                }
+                notUnderAttack = !isAttacked(p1) && !isAttacked(p2) && !isAttacked(p3);
+                notOccupied = !board.isOccupied(p1) && !board.isOccupied(p2) && !board.isOccupied(p3);
+                return (notOccupied && notUnderAttack);
+            }
+
+        } else {  //short castle
+            if (!hasMoved && !board.whichPiece(new Position(1, 8)).hasMoved){ //long castle
+                if (color == 'w') {
+                    p1 = new Position(1, 7);
+                    p2 = new Position(1, 6);
+                } else {
+                    p1 = new Position(8, 7);
+                    p2 = new Position(8, 6);
+                }
+                notUnderAttack = !isAttacked(p1) && !isAttacked(p2);
+                notOccupied = !board.isOccupied(p1) && !board.isOccupied(p2);
+                return (notOccupied && notUnderAttack);
+            }
+        }
+        return false;
+    }
+
+    private boolean isAttacked(Position p) {
+        Piece attacker;
+        Position p1;
+
+        for (int i = 1; i <= 8; i++)
+            for (int j =1; j <= 8; j++) {
+                p1 = new Position(i, j);
+                attacker = board.whichPiece(p1);
+                if (attacker == null) {}
+                else if (attacker.color != color && !(attacker.getClass() == this.getClass())) { //skips friendly pieces and king itself
+                    attacker.refreshLegalMoves();
+                    for (Position pos : attacker.legalMoves) {
+                        if (pos.equals(p)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        return false;
+    }
+
     @Override
     public String toString() {
         if (color == 'w') return "KI ";
         else return "ki ";
-    }
-
-    public boolean canCastle(int longOrShort) {
-        Position p1;
-        Piece attacker;
-        boolean underAttack = false;
-        if (color == 'w') {
-            if (longOrShort == 1) {
-                if (!hasMoved && !board.whichPiece(new Position(1, 1)).hasMoved) //long castle
-                    for (int i = 0; i <= 8 && !underAttack; i++) //check if castling squares are under attack
-                        for (int j = 0; j <= 8 && !underAttack; j++) {
-                            p1 = new Position(i, j);
-                            attacker = board.whichPiece(p1);
-                            if (attacker == null) break;
-                            if (attacker.color != color) {
-                                attacker.refreshLegalMoves();
-                                for (Position p2 : attacker.legalMoves)
-                                    if (p2.equals(new Position(1, 2)) || p2.equals(new Position(1, 3)) || p2.equals(new Position(1, 4)))
-                                        underAttack = true;
-                            }
-                        }
-                if (!board.isOccupied(new Position(1, 2)) && !board.isOccupied(new Position(1, 3)) && !board.isOccupied(new Position(1, 4)) && !underAttack) {
-                    return true;
-                }
-            } else {
-                if (!hasMoved && !board.whichPiece(new Position(1, 8)).hasMoved) //short castle
-                    for (int i = 0; i <= 8 && !underAttack; i++) //check if castling squares are under attack
-                        for (int j = 0; j <= 8 && !underAttack; j++) {
-                            p1 = new Position(i, j);
-                            attacker = board.whichPiece(p1);
-                            if (attacker == null) break;
-                            if (attacker.color != color) {
-                                attacker.refreshLegalMoves();
-                                for (Position p2 : attacker.legalMoves)
-                                    if (p2.equals(new Position(1, 7)) || p2.equals(new Position(1, 6)))
-                                        underAttack = true;
-                            }
-                        }
-                if (!board.isOccupied(new Position(1, 7)) && !board.isOccupied(new Position(1, 6)) && !underAttack) {
-                    return true;
-                }
-            }
-        } else {
-            if (longOrShort == 1) {
-                if (!hasMoved && !board.whichPiece(new Position(8, 1)).hasMoved) //long castle
-                    for (int i = 0; i <= 8 && !underAttack; i++) //check if castling squares are under attack
-                        for (int j = 0; j <= 8 && !underAttack; j++) {
-                            p1 = new Position(i, j);
-                            attacker = board.whichPiece(p1);
-                            if (attacker == null) break;
-                            if (attacker.color != color) {
-                                attacker.refreshLegalMoves();
-                                for (Position p2 : attacker.legalMoves)
-                                    if (p2.equals(new Position(8, 2)) || p2.equals(new Position(8, 3)) || p2.equals(new Position(8, 4)))
-                                        underAttack = true;
-                            }
-                        }
-                if (!board.isOccupied(new Position(8, 2)) && !board.isOccupied(new Position(8, 3)) && !board.isOccupied(new Position(8, 4)) && !underAttack) {
-                    return true;
-                }
-            } else {
-                if (!hasMoved && !board.whichPiece(new Position(8, 8)).hasMoved) //short castle
-                    for (int i = 0; i <= 8 && !underAttack; i++) //check if castling squares are under attack
-                        for (int j = 0; j <= 8 && !underAttack; j++) {
-                            p1 = new Position(i, j);
-                            attacker = board.whichPiece(p1);
-                            if (attacker == null) break;
-                            if (attacker.color != color) {
-                                attacker.refreshLegalMoves();
-                                for (Position p2 : attacker.legalMoves)
-                                    if (p2.equals(new Position(8, 7)) || p2.equals(new Position(8, 6)))
-                                        underAttack = true;
-                            }
-                        }
-                if (!board.isOccupied(new Position(8, 7)) && !board.isOccupied(new Position(8, 6)) && !underAttack) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }

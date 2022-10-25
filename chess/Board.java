@@ -5,10 +5,12 @@ import chess.pieces.*;
 public class Board {
     //instances
     public Piece[][] board;
+    public static boolean kingInCheck;
 
     //constructor
     public Board(Piece[][] board) {
         this.board = board;
+        kingInCheck = false;
     }
 
     //methods

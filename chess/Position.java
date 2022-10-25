@@ -22,6 +22,6 @@ public class Position {
     @Override
     public String toString() {
 
-        return (column + ", " + (char) (row + 48));
+        return ((char) (column + 96) + "" + row);
     }
 }

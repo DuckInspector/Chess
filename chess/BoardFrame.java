@@ -2,14 +2,13 @@ package chess;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class MyFrame extends JFrame {
+public class BoardFrame extends JFrame {
     public JPanel buttonPanel;
-    public MyFrame(Board b) {
+    public BoardFrame(Board b) {
 
         setPreferredSize(new Dimension(800, 828));
+        setResizable(false);
         //create board background panel
         Background background = new Background();
 
